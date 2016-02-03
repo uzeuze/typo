@@ -415,6 +415,22 @@ class Article < Content
   def access_by?(user)
     user.admin? || user_id == user.id
   end
+  
+  def merge_with(other_article_id)
+    tomerge = Article.find_by_id(other_article_id)
+    if not self.id or not tomerge.id
+      return false
+    end
+
+    self.body = self.body + "\n\n" + tomerge.body
+    self.comments << tomerge.comments
+    self.save!
+
+    tomerge = Article.find_by_id(other_article_id)
+    tomerge.destroy
+
+    return true
+  end
 
   protected
 
